@@ -42,7 +42,7 @@ io.on("connection", (socket) => {
 
 app.set("io", io);
 
-mongoose.connect(process.env.MONGODB_URL)
+ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch((error) => console.log('DB Connection Error:', error));
 
