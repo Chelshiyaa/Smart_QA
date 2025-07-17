@@ -1,17 +1,23 @@
 const express = require('express');
-const router = express.Router();
+const { body } = require('express-validator');
 const roomController = require('../controllers/roomController');
+const { authenticateUser, authorizeRoles } = require('../middleware/authMiddleware');
 
-// Create a new room
-router.post('/', roomController.createRoom);
+const router = express.Router();
 
-// Get a room by code
+router.post(
+  '/',
+  body('createdBy').notEmpty().withMessage('createdBy is required'),
+  roomController.createRoom
+);
 router.get('/:code', roomController.getByRoomCode);
-
-// Add a question to a room
-router.post('/:code/question', roomController.createQuestion); // CHANGED to POST
-
-// Get all questions for a room
-router.get('/:code/questions', roomController.getQuestions);
+router.post(
+  '/:code/question',
+  [body('content').notEmpty(), body('createdBy').notEmpty()],
+  roomController.createQuestion
+);
+router.get('/:code/question', roomController.getQuestion);
+router.delete('/:code', authenticateUser, authorizeRoles('admin'), roomController.deleteRoom);
+router.delete('/:code/question/:id', authenticateUser, authorizeRoles('admin'), roomController.deleteQuestion);
 
 module.exports = router;
